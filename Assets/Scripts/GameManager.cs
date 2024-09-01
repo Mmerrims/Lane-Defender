@@ -2,23 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private PlayerInput gameInputs;
-    private Transform spawnLoc;
-    [SerializeField] private Transform EnemySpawnPoint1;
-    [SerializeField] private Transform EnemySpawnPoint2;
-    [SerializeField] private Transform EnemySpawnPoint3;
-    [SerializeField] private Transform EnemySpawnPoint4;
-    [SerializeField] private Transform EnemySpawnPoint5;
+    private Vector3 spawnLoc;
+    [SerializeField] private float health;
     private GameObject enemy;
     [SerializeField] private GameObject enemyFast;
     [SerializeField] private GameObject enemyMedium;
     [SerializeField] private GameObject enemySlow;
     [SerializeField] private float enemyCooldown;
+    [SerializeField] private GameObject LivesText;
+    [SerializeField] private GameObject ScoreText;
+    [SerializeField] private GameObject DeathScreen;
+    private bool gameIsActive = true;
 
-    ///[SerializeField] private InputAction ManagerControls;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -36,9 +37,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void QuitGame()
+    public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene("SampleScene");
     }
 
     private void OnEnable()
@@ -53,9 +59,12 @@ public class GameManager : MonoBehaviour
 
     void EnemySpawner()
     {
-        DecideEnemyType();
-        DecideEnemyLocation();
-        Instantiate(enemy, spawnLoc);
+        if (gameIsActive == true)
+        {
+            DecideEnemyType();
+            DecideEnemyLocation();
+            Instantiate(enemy, spawnLoc, Quaternion.identity);
+        }
     }
 
     void DecideEnemyType()
@@ -77,23 +86,34 @@ public class GameManager : MonoBehaviour
         float location = Random.Range(1, 6);
         if(location == 1 )
         {
-            spawnLoc = EnemySpawnPoint1;
+            spawnLoc = new Vector3 (10, 0, 0);
         }
         else if (location == 2 )
         {
-            spawnLoc = EnemySpawnPoint2;
+            spawnLoc = new Vector3 (10, -1, 0);
         }
         else if(location == 3 )
         {
-            spawnLoc = EnemySpawnPoint3;
+            spawnLoc = new Vector3(10, -2, 0);
         }
         else if (location == 4)
         {
-            spawnLoc = EnemySpawnPoint4;
+            spawnLoc = new Vector3(10, -3, 0);
         }
         else
         {
-            spawnLoc = EnemySpawnPoint5;
+            spawnLoc = new Vector3(10, -4, 0);
+        }
+    }
+    public void LoseLife()
+    {
+        health--;
+        LivesText.GetComponent<TextMesh>().text = ("Lives:" + health).ToString();
+        if(health == 0 )
+        {
+            //Game Ends Here
+            DeathScreen.SetActive(true);
+            gameIsActive = false;
         }
     }
 }

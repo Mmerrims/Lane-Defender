@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
             ///Here is where the shoot animation is called
             animator.SetBool("shooting", true);
             //Summons the bullet
-            Instantiate(bullet, cannon);
+            Instantiate(bullet);
         }
     }
 
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
     public IEnumerator shootCooldownTimer()
     {
         animator.SetBool("shooting", false);
-        canShoot = false;
+        canShoot = true;
         yield return new 
             WaitForSeconds(shootCooldown);
         canShoot = true;
