@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -7,6 +9,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private PlayerInput gameInputs;
+    [SerializeField] private InputAction restartInput;
+    [SerializeField] private InputAction quitInput;
     private Vector3 spawnLoc;
     [SerializeField] private float health;
     private GameObject enemy;
@@ -18,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject ScoreText;
     [SerializeField] private GameObject DeathScreen;
     private bool gameIsActive = true;
+    [SerializeField] private AudioClip loseLifeSound;
 
     
     // Start is called before the first frame update
@@ -49,12 +54,14 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        gameInputs.enabled = true;
+        restartInput.Enable();
+        quitInput.Enable();
     }
 
     private void OnDisable()
     {
-        gameInputs.enabled = false;
+        restartInput.Disable();
+        quitInput.Disable();
     }
 
     void EnemySpawner()
@@ -69,7 +76,7 @@ public class GameManager : MonoBehaviour
 
     void DecideEnemyType()
     {
-        float type = Random.Range(1, 4);
+        float type = UnityEngine.Random.Range(1, 4);
         if(type == 1)
         {
             enemy = enemyFast;
@@ -83,7 +90,7 @@ public class GameManager : MonoBehaviour
 
     void DecideEnemyLocation()
     {
-        float location = Random.Range(1, 6);
+        float location = UnityEngine.Random.Range(1, 6);
         if(location == 1 )
         {
             spawnLoc = new Vector3 (10, 0, 0);
@@ -108,12 +115,32 @@ public class GameManager : MonoBehaviour
     public void LoseLife()
     {
         health--;
-        LivesText.GetComponent<TextMesh>().text = ("Lives:" + health).ToString();
+        LivesText.GetComponent<TextMeshProUGUI>().text = ("Lives:" + health).ToString();
+        AudioSource.PlayClipAtPoint(loseLifeSound, Vector3.zero, 1f);
         if(health == 0 )
         {
             //Game Ends Here
             DeathScreen.SetActive(true);
             gameIsActive = false;
+        }
+        
+    }
+
+    public void AddScore(float score)
+    {
+        ScoreText.GetComponent<TextMeshProUGUI>().text = ("Score:" + score).ToString();
+    }
+
+    private void FixedUpdate()
+    {
+        if( quitInput.IsPressed())
+        {
+            QuitGame();
+        }
+
+        if( restartInput.IsPressed() )
+        {
+            RestartGame();
         }
     }
 }

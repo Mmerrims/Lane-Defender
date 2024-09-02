@@ -13,8 +13,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private float shootCooldown;
     private bool canShoot;
-    [SerializeField] private GameObject bullet;
+    [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform cannon;
+    [SerializeField] private AudioClip shootSound;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +39,11 @@ public class PlayerController : MonoBehaviour
             ///Here is where the shoot animation is called
             animator.SetBool("shooting", true);
             //Summons the bullet
-            Instantiate(bullet);
+            Instantiate(bulletPrefab, cannon.transform.position, Quaternion.identity);
+            //Shoot Sound
+            AudioSource.PlayClipAtPoint(shootSound, Vector3.zero, 3f);
+            //Restarts the cooldown
+            StartCoroutine(shootCooldownTimer());
         }
     }
 
@@ -56,11 +61,12 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator shootCooldownTimer()
     {
-        animator.SetBool("shooting", false);
-        canShoot = true;
+        //animator.SetBool("shooting", false);
+        canShoot = false;
         yield return new 
             WaitForSeconds(shootCooldown);
         canShoot = true;
+        animator.SetBool("shooting", false);
     }
 
 }
